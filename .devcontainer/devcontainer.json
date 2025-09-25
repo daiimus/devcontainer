@@ -28,5 +28,7 @@
         }
     },
 
+    "postCreateCommand": "mkdir -p ~/.config/blightmud && echo '(settings:{\"logging_enabled\":true})' > ~/.config/blightmud/settings.ron && git clone https://github.com/daiimus/gelatinous.git /workspaces/devcontainer/gelatinous || echo 'Note: If gelatinous repo clone failed, check that the repository exists'",
+
     "remoteUser": "vscode"
 }
