@@ -1,3 +1,7 @@
+# Devcontainer build and debugging files
+*.log
+.devcontainer-setup-complete
+
 # Temporary files
 /tmp/
 *.tmp
