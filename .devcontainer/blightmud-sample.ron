@@ -1,0 +1,34 @@
+(
+    // Sample BlightMUD configuration
+    // This will be automatically copied to ~/.config/blightmud/settings.ron
+    
+    mud_connections: [
+        // Example connections - customize these for your needs
+        (
+            name: "Local Development",
+            host: "localhost",
+            port: 4000,
+        ),
+        // Add your production server here
+        // (
+        //     name: "Production Server",
+        //     host: "your-mud-server.com",
+        //     port: 4000,
+        // ),
+    ],
+    
+    tts_enabled: false,
+    tts_rate: 0,
+    tts_pitch: 0,
+    confirm_quit: true,
+    mouse_enabled: true,
+    vi_mode: false,
+    tab_completion_enabled: true,
+    save_password: false,
+    auto_login: false,
+    logging_enabled: true,
+    log_format: "txt",
+    prompt_input: "> ",
+    prompt_input_color: "White",
+    theme_name: "default",
+)
