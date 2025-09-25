@@ -1,126 +1,78 @@
-# Evennia Development Devcontainer
+# Evennia Development Container
 
-A GitHub Codespaces devcontainer repository for developing [Evennia](https://github.com/evennia/evennia) MUD games with integrated [BlightMUD](https://github.com/blightmud/blightmud) client. This environment automatically sets up your development workspace with the [Gelatinous](https://github.com/daiimus/gelatinous) project.
+A clean, simple GitHub Codespaces devcontainer for developing [Evennia](https://github.com/evennia/evennia) MUD games.
 
 ## Features
 
-- 🐍 **Python 3.11** with Evennia framework pre-installed
-- 🦀 **Rust environment** with BlightMUD terminal MUD client
-- 🎮 **Automatic Gelatinous setup** - your game project is cloned and configured automatically
-- 🔧 **VS Code extensions** for Python and Rust development
-- 🌐 **Port forwarding** for Evennia web interface and game servers
-- ⚡ **Pre-configured aliases** for common development tasks
+- 🐍 **Python 3.11** with Evennia 5.0.1 pre-installed
+- 🎮 **Ready to develop** - No complex setup scripts
+- 🌐 **Port forwarding** for Evennia servers (4000, 4005)
+- ⚡ **Fast startup** - Minimal, reliable configuration
 
 ## Quick Start
 
 ### Using GitHub Codespaces
 
-1. **Create a new Codespace:**
-   - Go to [GitHub Codespaces](https://github.com/codespaces)
-   - Click "New codespace"
-   - Select this repository (`daiimus/devcontainer`)
-   - Click "Create codespace"
-
-2. **Wait for setup:**
-   - The environment will automatically install all dependencies
-   - Gelatinous will be cloned to `/workspace/gelatinous`
-   - All tools will be configured and ready to use
-
-3. **Start developing:**
+1. **Create a Codespace from this repository**
+2. **Wait for container to build** (2-3 minutes)
+3. **Start developing immediately:**
    ```bash
-   # Start your Evennia server
-   evennia-start
+   # Verify Evennia is installed
+   evennia --version
    
-   # Connect with BlightMUD client
-   blightmud
+   # Create a new game
+   evennia --init mygame
+   cd mygame
+   evennia migrate
+   evennia start
    ```
 
-### Manual Setup
+### Using in Your Own Repository
 
-If you want to use this devcontainer in your own repository:
+Copy the `.devcontainer` folder to your repository root, then rebuild your container.
 
-1. Copy the `.devcontainer` folder to your repository root
-2. Open the repository in VS Code
-3. When prompted, reopen in container
+## What's Included
 
-## Available Commands
-
-The setup script creates several useful aliases:
-
-### Evennia Commands
-- `evennia-start` - Start the Evennia server
-- `evennia-stop` - Stop the Evennia server  
-- `evennia-restart` - Restart the Evennia server
-- `evennia-shell` - Open Evennia Python shell
-
-### MUD Client
-- `blightmud` or `mud` - Start BlightMUD terminal client
-
-### Development
-- Standard Git aliases (`gs`, `ga`, `gc`, `gp`, `gl`)
-- File navigation aliases (`ll`, `la`, `..`, `...`)
+- **Evennia 5.0.1** - Complete MUD framework
+- **Python 3.11** - Latest stable Python
+- **Basic dev tools** - Git, curl, wget, etc. via devcontainer features
+- **VS Code Python extension** - For development support
 
 ## Ports
 
-The following ports are automatically forwarded:
+Automatically forwarded ports:
+- **4000** - Telnet game server
+- **4005** - Web client interface
 
-- **4000** - Evennia Web Server
-- **4001** - Evennia Portal
-- **4002** - Evennia Server  
-- **4005** - Evennia Web Client (main web interface)
+## Adding BlightMUD
 
-## Project Structure
+To add the BlightMUD terminal client:
 
-After setup, your workspace will contain:
+```bash
+# Download and install BlightMUD
+curl -L https://github.com/blightmud/blightmud/releases/latest/download/blightmud-linux.tar.gz -o blightmud.tar.gz
+tar -xzf blightmud.tar.gz
+sudo mv blightmud /usr/local/bin/
+rm blightmud.tar.gz
+
+# Test it
+blightmud --version
+```
+
+## File Structure
 
 ```
-/workspace/
-├── gelatinous/          # Your Evennia game project (auto-cloned)
-└── .devcontainer/       # Container configuration
-    ├── devcontainer.json
-    ├── Dockerfile
-    └── setup.sh
+.devcontainer/
+├── Dockerfile          # Minimal Python + Evennia setup
+└── devcontainer.json   # Simple container configuration
 ```
 
-## Connecting to Your Game
+## Why This Works
 
-### Local Development
-1. Start your Evennia server: `evennia-start`
-2. Open BlightMUD: `blightmud`
-3. Connect to `localhost:4000` (or use the web client on port 4005)
+This container focuses on **simplicity and reliability**:
+- No complex post-creation scripts
+- No project-specific assumptions  
+- No unnecessary dependencies
+- Clean, minimal configuration
 
-### Production Connection
-1. Open BlightMUD: `blightmud`
-2. Connect to your production server address
-3. Use the client to play while developing locally
-
-## Customization
-
-### BlightMUD Configuration
-BlightMUD settings are stored in `/home/vscode/.config/blightmud/settings.ron`
-
-### Adding Dependencies
-- Python packages: Add to `gelatinous/requirements.txt`
-- System packages: Modify `.devcontainer/Dockerfile`
-- VS Code extensions: Edit `devcontainer.json`
-
-## Troubleshooting
-
-### Container Won't Start
-- Check the logs in the terminal
-- Ensure Docker is running
-- Try rebuilding the container
-
-### Evennia Server Issues
-- Check the logs: `cd gelatinous && evennia log`
-- Ensure migrations are applied: `evennia migrate`
-- Restart the server: `evennia-restart`
-
-### BlightMUD Issues
-- Check configuration in `/home/vscode/.config/blightmud/`
-- Ensure the MUD server is running and accessible
-- Try connecting with telnet first: `telnet localhost 4000`
-
-## Contributing
-
-Feel free to submit issues and pull requests to improve this devcontainer setup!
+Perfect for getting started with Evennia development quickly!

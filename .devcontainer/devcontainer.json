@@ -1,123 +1,32 @@
 {
-    "name": "Evennia + BlightMUD Development",
+    "name": "Evennia Development",
     "dockerFile": "Dockerfile",
     
     "features": {
         "ghcr.io/devcontainers/features/common-utils:2": {
             "installZsh": true,
-            "installOhMyZsh": true,
-            "upgradePackages": true,
-            "username": "vscode",
-            "userUid": "automatic",
-            "userGid": "automatic"
+            "username": "vscode"
         }
     },
 
     "customizations": {
         "vscode": {
             "extensions": [
-                "ms-python.python",
-                "ms-python.flake8",
-                "ms-python.black-formatter",
-                "ms-python.isort",
-                "rust-lang.rust-analyzer",
-                "vadimcn.vscode-lldb",
-                "serayuzgur.crates",
-                "tamasfe.even-better-toml",
-                "ms-vscode.vscode-json",
-                "redhat.vscode-yaml",
-                "ms-vscode.theme-tomorrowkit",
-                "ms-vscode.vscode-typescript-next",
-                "GitLab.gitlab-workflow"
-            ],
-            "settings": {
-                "python.defaultInterpreterPath": "/usr/local/bin/python",
-                "python.linting.enabled": true,
-                "python.linting.flake8Enabled": true,
-                "python.formatting.provider": "black",
-                "python.sortImports.provider": "isort",
-                "rust-analyzer.check.command": "clippy",
-                "rust-analyzer.cargo.buildScripts.enable": true,
-                "terminal.integrated.defaultProfile.linux": "bash",
-                "terminal.integrated.profiles.linux": {
-                    "bash": {
-                        "path": "/bin/bash",
-                        "args": ["--login"]
-                    },
-                    "zsh": {
-                        "path": "/usr/bin/zsh",
-                        "args": ["--login"]
-                    }
-                },
-                "files.watcherExclude": {
-                    "**/target/**": true,
-                    "**/.cargo/**": true
-                },
-                "search.exclude": {
-                    "**/target": true,
-                    "**/.cargo": true,
-                    "**/node_modules": true
-                }
-            }
+                "ms-python.python"
+            ]
         }
     },
 
-    "forwardPorts": [4000, 4001, 4002, 4005],
+    "forwardPorts": [4000, 4005],
     "portsAttributes": {
         "4000": {
-            "label": "Evennia Telnet Server",
-            "onAutoForward": "notify"
-        },
-        "4001": {
-            "label": "Evennia Portal",
-            "onAutoForward": "silent"
-        },
-        "4002": {
-            "label": "Evennia Server",
-            "onAutoForward": "silent"
+            "label": "Evennia Telnet Server"
         },
         "4005": {
             "label": "Evennia Web Client",
-            "protocol": "http",
-            "onAutoForward": "openBrowser"
+            "protocol": "http"
         }
     },
 
-    "containerEnv": {
-        "EVENNIA_SETTINGS_MODULE": "gelatinous.settings",
-        "EVENNIA_LOG_LEVEL": "INFO",
-        "RUST_LOG": "info",
-        "PYTHONPATH": "/home/vscode/workspace/gelatinous",
-        "PATH": "/home/vscode/.local/bin:${containerEnv:PATH}"
-    },
-
-    "remoteUser": "vscode",
-    "workspaceFolder": "/home/vscode/workspace",
-
-    "onCreateCommand": [
-        "bash", "-c", 
-        "echo 'Container created at $(date)' >> /home/vscode/devcontainer-logs/lifecycle.log && /home/vscode/health-check.sh"
-    ],
-    
-    "postCreateCommand": ".devcontainer/setup.sh",
-    
-    "postStartCommand": [
-        "bash", "-c",
-        "echo 'Container started at $(date)' >> /home/vscode/devcontainer-logs/lifecycle.log"
-    ],
-
-    "mounts": [
-        "source=evennia-vscode-extensions,target=/home/vscode/.vscode-server/extensions,type=volume",
-        "source=evennia-cargo-cache,target=/home/vscode/.cargo,type=volume"
-    ],
-
-    "containerUser": "vscode",
-    "updateRemoteUserUID": true,
-
-    "shutdownAction": "stopContainer",
-    
-    "initializeCommand": [
-        "bash", "-c",
-        "echo 'Initializing devcontainer at $(date)' && echo 'This may take several minutes on first run...'"
-    ]
+    "remoteUser": "vscode"
 }
