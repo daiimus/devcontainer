@@ -2,6 +2,9 @@
 *.log
 .devcontainer-setup-complete
 
+# Auto-cloned repositories (created by postCreateCommand)
+gelatinous/
+
 # Temporary files
 /tmp/
 *.tmp
