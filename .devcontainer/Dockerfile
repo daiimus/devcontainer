@@ -1,26 +1,25 @@
-# Evennia + BlightMUD Development Container
-# Multi-stage build for better reliability and caching
+# Simple Evennia + BlightMUD Development Container
+# Using packages instead of compilation for reliability
 
-FROM python:3.11-slim as base
+FROM python:3.11-slim
 
 # Set environment variables to prevent interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV RUST_LOG=info
 
-# Create log directory early
-RUN mkdir -p /var/log/devcontainer
-
-# Install system dependencies with error handling
+# Install system dependencies including OpenSSL dev packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    # Build essentials
+    # Essential build tools
     build-essential \
     pkg-config \
-    # Git and version control
+    # Git and downloads
     git \
     curl \
     wget \
+    # OpenSSL development packages (needed for Rust/BlightMUD)
+    libssl-dev \
+    libssl3 \
     # Database support for Evennia
     sqlite3 \
     libsqlite3-dev \
@@ -28,66 +27,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     net-tools \
     telnet \
     netcat-openbsd \
-    # Process management
-    supervisor \
     # Additional utilities
     tree \
     htop \
     vim \
     nano \
-    # SSL and security
+    # Security
     ca-certificates \
     gnupg \
-    lsb-release \
-    # Development tools
-    make \
-    gcc \
-    g++ \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && echo "System packages installed successfully" > /var/log/devcontainer/system-packages.log
-
-# Install Rust and Cargo with error handling
-FROM base as rust-installer
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
-    && echo "Rust installation completed" > /var/log/devcontainer/rust-install.log
-ENV PATH="/root/.cargo/bin:${PATH}"
-
-# Verify Rust installation
-RUN rustc --version && cargo --version \
-    && echo "Rust verification passed: $(rustc --version)" >> /var/log/devcontainer/rust-install.log
-
-# Build BlightMUD from source with error handling
-FROM rust-installer as blightmud-builder
-WORKDIR /tmp/blightmud
-
-# Clone BlightMUD with error handling and retry
-RUN set -e; \
-    for i in 1 2 3; do \
-        git clone https://github.com/blightmud/blightmud.git . && break || \
-        (echo "Attempt $i failed, retrying..." && sleep 5); \
-    done && \
-    echo "BlightMUD cloned successfully" > /var/log/devcontainer/blightmud-clone.log
-
-# Build BlightMUD with resource constraints for Codespaces
-RUN set -e; \
-    echo "Starting BlightMUD build..." && \
-    # Limit parallelism to prevent OOM in Codespaces
-    export CARGO_BUILD_JOBS=2 && \
-    cargo build --release --verbose 2>&1 | tee /var/log/devcontainer/blightmud-build.log && \
-    echo "BlightMUD build completed successfully" >> /var/log/devcontainer/blightmud-build.log
-
-# Final stage - combine everything
-FROM base as final
-
-# Copy Rust toolchain
-COPY --from=rust-installer /root/.cargo /root/.cargo
-COPY --from=rust-installer /root/.rustup /root/.rustup
-ENV PATH="/root/.cargo/bin:${PATH}"
-
-# Copy BlightMUD binary
-COPY --from=blightmud-builder /tmp/blightmud/target/release/blightmud /usr/local/bin/blightmud
-COPY --from=blightmud-builder /var/log/devcontainer/blightmud-*.log /var/log/devcontainer/
 
 # Create vscode user with proper permissions
 RUN useradd --create-home --shell /bin/bash vscode \
@@ -100,14 +50,27 @@ RUN useradd --create-home --shell /bin/bash vscode \
 RUN cp -r /var/log/devcontainer /home/vscode/devcontainer-logs \
     && chown -R vscode:vscode /home/vscode/devcontainer-logs
 
-# Install Python dependencies for Evennia
+# Switch to vscode user
 USER vscode
 WORKDIR /home/vscode
 
-# Upgrade pip and install Evennia with error handling
+# Install Evennia via pip (much faster than compilation)
 RUN python -m pip install --upgrade pip \
     && pip install --user evennia \
     && echo "Evennia installed: $(pip show evennia | grep Version)" > /home/vscode/devcontainer-logs/evennia-install.log
+
+# Download BlightMUD pre-built binary (avoid compilation)
+RUN curl -L https://github.com/blightmud/blightmud/releases/latest/download/blightmud-linux.tar.gz -o /tmp/blightmud.tar.gz \
+    && cd /tmp \
+    && tar -xzf blightmud.tar.gz \
+    && mkdir -p /home/vscode/.local/bin \
+    && mv blightmud /home/vscode/.local/bin/ \
+    && chmod +x /home/vscode/.local/bin/blightmud \
+    && rm blightmud.tar.gz \
+    && echo "BlightMUD binary installed" > /home/vscode/devcontainer-logs/blightmud-install.log
+
+# Update PATH for local binaries
+ENV PATH="/home/vscode/.local/bin:${PATH}"
 
 # Verify installations
 RUN python -c "import evennia; print(f'Evennia version: {evennia.__version__}')" \
@@ -118,35 +81,21 @@ RUN python -c "import evennia; print(f'Evennia version: {evennia.__version__}')"
 RUN mkdir -p /home/vscode/workspace
 
 # Health check script
-COPY --chown=vscode:vscode <<'EOF' /home/vscode/health-check.sh
-#!/bin/bash
-set -e
-
-echo "=== Devcontainer Health Check ==="
-echo "Timestamp: $(date)"
-
-# Check Python and Evennia
-echo "Checking Python..."
-python --version
-python -c "import evennia; print(f'Evennia version: {evennia.__version__}')"
-
-# Check Rust and BlightMUD
-echo "Checking Rust..."
-rustc --version
-blightmud --version
-
-# Check network tools
-echo "Checking network tools..."
-which telnet && which nc
-
-# Check logs
-echo "Installation logs available at:"
-ls -la /home/vscode/devcontainer-logs/
-
-echo "=== Health Check Complete ==="
-EOF
-
-RUN chmod +x /home/vscode/health-check.sh
+RUN echo '#!/bin/bash\n\
+set -e\n\
+echo "=== Devcontainer Health Check ==="\n\
+echo "Timestamp: $(date)"\n\
+echo "Checking Python..."\n\
+python --version\n\
+python -c "import evennia; print(f'\''Evennia version: {evennia.__version__}'\'')" \n\
+echo "Checking BlightMUD..."\n\
+blightmud --version\n\
+echo "Checking network tools..."\n\
+which telnet && which nc\n\
+echo "Installation logs available at:"\n\
+ls -la /home/vscode/devcontainer-logs/\n\
+echo "=== Health Check Complete ==="\n' > /home/vscode/health-check.sh \
+    && chmod +x /home/vscode/health-check.sh
 
 # Set working directory
 WORKDIR /home/vscode/workspace
