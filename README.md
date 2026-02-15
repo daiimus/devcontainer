@@ -18,11 +18,36 @@ Open the terminal in VS Code (`` Ctrl+` ``) and run:
 
 ```bash
 evennia --init mygame
+```
+
+`evennia --init` creates a new game folder with all the starter files you need. Replace `mygame` with whatever you want to name your game.
+
+Next, configure the webclient for Codespaces:
+
+```bash
+.devcontainer/setup-codespace.sh mygame
+```
+
+This adds the following to `mygame/server/conf/secret_settings.py`:
+
+```python
+import os
+CODESPACE_NAME = os.environ.get("CODESPACE_NAME")
+if CODESPACE_NAME:
+    DOMAIN = os.environ.get("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN", "app.github.dev")
+    WEBSOCKET_CLIENT_URL = f"wss://{CODESPACE_NAME}-4002.{DOMAIN}"
+```
+
+Evennia runs its web page (port 4001) and websocket (port 4002) on separate ports. Codespaces proxies each port through its own URL, so the webclient needs to be told where the websocket lives. `WEBSOCKET_CLIENT_URL` overrides the default and points it at the correct Codespaces address. `secret_settings.py` is Evennia's local override file — already imported by `settings.py` and in `.gitignore`.
+
+Finally, set up the database and enter your game directory:
+
+```bash
 cd mygame
 evennia migrate
 ```
 
-`evennia --init` creates a new game folder with all the starter files you need. `evennia migrate` sets up the database — you only need to run this once.
+You only need to run `migrate` once.
 
 ### 3. Start the Server
 
@@ -81,7 +106,8 @@ mygame/
 ├── commands/          # Your custom commands
 ├── server/
 │   ├── conf/
-│   │   └── settings.py   # Your game settings (add overrides here)
+│   │   ├── settings.py          # Your game settings (add overrides here)
+│   │   └── secret_settings.py   # Local/environment overrides (.gitignored)
 │   └── logs/              # Server logs
 ├── typeclasses/       # Custom object, character, and room types
 ├── web/               # Web interface customization
@@ -98,7 +124,7 @@ See the [Game Dir Overview](https://www.evennia.com/docs/latest/Howtos/Beginner-
 |------|-------------|
 | 4000 | Telnet — for connecting with traditional MUD clients |
 | 4001 | Web — Evennia's webclient and web admin interface |
-| 4002 | WebSocket — used internally by the webclient |
+| 4002 | WebSocket — the webclient connects here (see setup step above) |
 
 ## Learn More
 
