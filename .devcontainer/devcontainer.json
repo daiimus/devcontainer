@@ -1,7 +1,7 @@
 {
     "name": "Evennia Development",
     "dockerFile": "Dockerfile",
-    
+
     "features": {
         "ghcr.io/devcontainers/features/common-utils:2": {
             "installZsh": true,
@@ -17,18 +17,19 @@
         }
     },
 
-    "forwardPorts": [4000, 4005],
+    "forwardPorts": [4000, 4001, 4002],
     "portsAttributes": {
         "4000": {
-            "label": "Evennia Telnet Server"
+            "label": "Evennia (Telnet)"
         },
-        "4005": {
-            "label": "Evennia Web Client",
+        "4001": {
+            "label": "Evennia (Webclient)",
             "protocol": "http"
+        },
+        "4002": {
+            "label": "Evennia (Websocket)"
         }
     },
-
-    "postCreateCommand": "mkdir -p ~/.config/blightmud && echo '(settings:{\"logging_enabled\":true})' > ~/.config/blightmud/settings.ron && git clone https://github.com/daiimus/gelatinous.git /workspaces/devcontainer/gelatinous || echo 'Note: If gelatinous repo clone failed, check that the repository exists'",
 
     "remoteUser": "vscode"
 }

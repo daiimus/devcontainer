@@ -1,69 +1,108 @@
 # Evennia Development Container
 
-A clean, simple GitHub Codespaces devcontainer for developing [Evennia](https://github.com/evennia/evennia) MUD games.
+Everything you need to start building a multiplayer text game with [Evennia](https://www.evennia.com), running in your browser via GitHub Codespaces. No local setup required.
 
-## Features
-
-- 🐍 **Python 3.11** with Evennia 5.0.1 pre-installed
-- 🎮 **BlightMUD client** - Latest version installed from official .deb package
-- 🌐 **Port forwarding** - Evennia servers (4000, 4005) ready to use
-- ⚡ **Fast startup** - Minimal, reliable configuration
+Evennia and all of its dependencies are pre-installed. Every container rebuild automatically pulls the latest stable versions — nothing to maintain.
 
 ## Quick Start
 
-### Using GitHub Codespaces
+### 1. Launch a Codespace
 
-1. **Create a Codespace from this repository**
-2. **Wait for container to build** (2-3 minutes)
-3. **Start developing immediately:**
-   ```bash
-   # Verify both tools are installed
-   evennia --version
-   blightmud --version
-   
-   # Create a new game
-   evennia --init mygame
-   cd mygame
-   evennia migrate
-   evennia start
-   
-   # In another terminal, connect with BlightMUD
-   blightmud
-   # Then in BlightMUD: connect localhost 4000
-   ```
+Click the green **Code** button at the top of this repository, select the **Codespaces** tab, and click **Create codespace on main**. A VS Code editor will open in your browser. Wait for the container to finish building (~2-3 minutes).
 
-### Using in Your Own Repository
+> You can also copy the `.devcontainer/` folder into your own repository to use this setup in any project.
 
-Copy the `.devcontainer` folder to your repository root, then rebuild your container.
+### 2. Create Your Game
 
-## What's Included
+Open the terminal in VS Code (`` Ctrl+` ``) and run:
 
-- **Evennia 5.0.1** - Complete MUD framework
-- **BlightMUD 5.3.1** - Terminal MUD client (automatically installed from official .deb)
-- **Python 3.11** - Latest stable Python
-- **Basic dev tools** - Git, curl, wget, etc. via devcontainer features
-- **VS Code Python extension** - For development support
+```bash
+evennia --init mygame
+cd mygame
+evennia migrate
+```
+
+`evennia --init` creates a new game folder with all the starter files you need. `evennia migrate` sets up the database — you only need to run this once.
+
+### 3. Start the Server
+
+```bash
+evennia start
+```
+
+You'll be asked to create a **superuser** account (pick any username and password). This will be your admin character with full permissions in the game.
+
+### 4. Play
+
+In the Codespaces **Ports** panel (next to the Terminal panel at the bottom), find port **4001** and click the globe icon to open it in a new tab. This is Evennia's built-in webclient. Log in with the account you just created.
+
+You can also connect with any MUD client (Mudlet, TinTin++, etc.) using port **4000**.
+
+### 5. Try the Tutorial World
+
+Once logged in, type:
+
+```
+batchcommand tutorial_world.build
+```
+
+This installs a small built-in adventure you can explore to see what Evennia can do. Type `tutorial` for instructions once it's loaded.
+
+## Useful Commands
+
+### Terminal (outside the game)
+
+```bash
+evennia start          # Start the server
+evennia restart        # Restart without disconnecting players
+evennia stop           # Shut down the server
+evennia start -l       # Start and tail the server log
+evennia -l             # Tail the log of a running server
+```
+
+### In-Game (as superuser)
+
+```
+help                   # List all available commands
+look                   # Look around the current room
+create bag             # Create a new object called "bag"
+dig north = kitchen    # Create a new room and link it
+examine me             # See detailed info about your character
+py 1 + 1              # Run Python code directly in-game
+reload                 # Reload the server after code changes
+```
+
+## Game Directory Structure
+
+After `evennia --init mygame`, your game folder looks like this:
+
+```
+mygame/
+├── commands/          # Your custom commands
+├── server/
+│   ├── conf/
+│   │   └── settings.py   # Your game settings (add overrides here)
+│   └── logs/              # Server logs
+├── typeclasses/       # Custom object, character, and room types
+├── web/               # Web interface customization
+└── world/             # World-building scripts and data
+```
+
+You build your game by editing the files in this folder. When you change code, type `reload` in-game or run `evennia reload` from the terminal to pick up your changes without restarting the server.
+
+See the [Game Dir Overview](https://www.evennia.com/docs/latest/Howtos/Beginner-Tutorial/Part1/Beginner-Tutorial-Gamedir-Overview.html) for a detailed walkthrough of each folder.
 
 ## Ports
 
-Automatically forwarded ports:
-- **4000** - Telnet game server
-- **4005** - Web client interface
+| Port | What It Does |
+|------|-------------|
+| 4000 | Telnet — for connecting with traditional MUD clients |
+| 4001 | Web — Evennia's webclient and web admin interface |
+| 4002 | WebSocket — used internally by the webclient |
 
-## File Structure
+## Learn More
 
-```
-.devcontainer/
-├── Dockerfile          # Minimal Python + Evennia setup
-└── devcontainer.json   # Simple container configuration
-```
-
-## Why This Works
-
-This container focuses on **simplicity and reliability**:
-- No complex post-creation scripts
-- No project-specific assumptions  
-- No unnecessary dependencies
-- Clean, minimal configuration
-
-Perfect for getting started with Evennia development quickly!
+- [Beginner Tutorial](https://www.evennia.com/docs/latest/Howtos/Beginner-Tutorial/Beginner-Tutorial-Overview.html) — a multi-part guided walkthrough that ends with a playable game
+- [Evennia Documentation](https://www.evennia.com/docs/latest/index.html) — full reference for all features
+- [Discord](https://discord.gg/AJJpcRUhtF) — get help from the community
+- [Discussion Forums](https://github.com/evennia/evennia/discussions) — Q&A and announcements

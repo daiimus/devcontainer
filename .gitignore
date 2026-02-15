@@ -1,9 +1,5 @@
-# Devcontainer build and debugging files
+# Logs
 *.log
-.devcontainer-setup-complete
-
-# Auto-cloned repositories (created by postCreateCommand)
-gelatinous/
 
 # Temporary files
 /tmp/
@@ -43,7 +39,6 @@ env.bak/
 venv.bak/
 
 # Evennia
-*.log
 evennia.db
 evennia.db3
 server/logs/
@@ -63,11 +58,3 @@ web/media/
 .Trashes
 ehthumbs.db
 Thumbs.db
-
-# Rust
-target/
-Cargo.lock
-
-# BlightMUD logs and configs (if accidentally copied to repo)
-*.log
-blightmud.log
